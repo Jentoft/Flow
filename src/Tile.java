@@ -82,6 +82,14 @@ public class Tile
 	{
 		return column;
 	}
+	
+	public int[] getCoords()
+	{
+		int[] temp = new int[2];
+		temp[0] = getRow();
+		temp[1] = getColumn();
+		return temp;
+	}
 
 	/**
 	 * Getter for color

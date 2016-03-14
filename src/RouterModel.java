@@ -625,4 +625,99 @@ public class RouterModel extends AbstractModel
 
 		return temp;
 	}
+	
+	private void findPaths()
+	{
+		for(int i = 0; i < wArr.length; i++)
+		{
+			wArr[i].setPaths(potentialPaths(wArr[i].getFirst().getCoords(), wArr[i].getT2().getCoords()));
+		}
+	}
+	
+	private ArrayList<path> potentialPaths(int[] coords, int[] end)
+	{
+		path p = new path(coords);
+		ArrayList<path> result = new ArrayList<path>();
+		result.add(p);
+		
+		if(!coords.equals(end))
+		{
+			//All paths after moving left, if left is a valid direction
+			int[] leftMove = new int[2];
+			leftMove[0] = coords[0] - 1;
+			leftMove[1] = coords[1];
+			//If the tile to the left is not off the board, empty, and non terminal...
+			if(leftMove[0] >= 0 && board[leftMove[0]][leftMove[1]].getIsEmpty() && !board[leftMove[0]][leftMove[1]].getIsTerminal())
+			{
+				ArrayList<path> temp = potentialPaths(leftMove,end);
+				for (int i = 0; i < temp.size(); i++)
+				{
+					//Only worry about paths that end where I need them to
+					if(temp.get(i).getPath().getLast().equals(end))
+					{
+						path tempP = p;
+						result.add(tempP.combine(temp.get(i)));
+					}
+				}
+			}
+			
+			//All paths after moving right if right is a valid direction
+			int[] rightMove = new int[2];
+			rightMove[0] = coords[0] + 1;
+			rightMove[1] = coords[1];
+			//If the tile to the left is not off the board, empty, and non terminal...
+			if(rightMove[0] <= board[0].length && board[rightMove[0]][rightMove[1]].getIsEmpty() && !board[rightMove[0]][rightMove[1]].getIsTerminal())
+			{
+				ArrayList<path> temp = potentialPaths(rightMove,end);
+				for (int i = 0; i < temp.size(); i++)
+				{
+					//Only worry about paths that end where I need them to
+					if(temp.get(i).getPath().getLast().equals(end))
+					{
+						path tempP = p;
+						result.add(tempP.combine(temp.get(i)));
+					}
+				}
+			}
+			
+			//All paths to the end after moving up if up is a valid move
+			int[] upMove = new int[2];
+			upMove[0] = coords[0];
+			upMove[1] = coords[1] + 1;
+			//If the tile to the left is not off the board, empty, and non terminal...
+			if(upMove[1] <= board[0].length && board[upMove[0]][upMove[1]].getIsEmpty() && !board[upMove[0]][upMove[1]].getIsTerminal())
+			{
+				ArrayList<path> temp = potentialPaths(upMove,end);
+				for (int i = 0; i < temp.size(); i++)
+				{
+					//Only worry about paths that end where I need them to
+					if(temp.get(i).getPath().getLast().equals(end))
+					{
+						path tempP = p;
+						result.add(tempP.combine(temp.get(i)));
+					}
+				}
+			}
+			
+			int[] downMove = new int[2];
+			downMove[0] = coords[0];
+			downMove[1] = coords[1] - 1;
+			//If the tile to the left is not off the board, empty, and non terminal...
+			if(downMove[1] >= 0 && board[downMove[0]][downMove[1]].getIsEmpty() && !board[downMove[0]][downMove[1]].getIsTerminal())
+			{
+				ArrayList<path> temp = potentialPaths(downMove,end);
+				for (int i = 0; i < temp.size(); i++)
+				{
+					//Only worry about paths that end where I need them to
+					if(temp.get(i).getPath().getLast().equals(end))
+					{
+						path tempP = p;
+						result.add(tempP.combine(temp.get(i)));
+					}
+				}
+			}
+		}
+		
+		return result;
+	}
 }
