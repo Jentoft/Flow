@@ -9,7 +9,7 @@ public class Wire
 	private Tile last;
 	private boolean isComplete;
 	private LinkedList<Tile> list;
-	private List<path> viablePaths = new ArrayList();
+	private ArrayList<path> viablePaths = new ArrayList<path>();
 	
 	/**
 	 * Defines a wire given the coordinates of the two terminals and the color associated with the wire
@@ -53,7 +53,7 @@ public class Wire
 	 */
 	public Tile getFirst()
 	{
-		return list.getFirst();
+		return t1;
 	}
 	
 	public Tile getT2()
@@ -163,12 +163,12 @@ public class Wire
 		return color;
 	}
 	
-	public List<path> getPaths()
+	public ArrayList<path> getPaths()
 	{
 		return viablePaths;
 	}
 	
-	public void setPaths(List<path> value)
+	public void setPaths(ArrayList<path> value)
 	{
 		viablePaths = value;
 	}

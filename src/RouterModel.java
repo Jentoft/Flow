@@ -15,6 +15,7 @@ public class RouterModel extends AbstractModel
 	private int numComp = 0; //How many wires have been completed?
 	private int numFilled = 0; //How many tiles have a section of wire in them?
 	private boolean hasBoard = true; //Has a board been loaded?
+	private int size = 0;
 	
 	/**
 	 * My constructor for my router model
@@ -26,6 +27,7 @@ public class RouterModel extends AbstractModel
 	{
 		board = new Tile[bSize][bSize];
 		wArr = new Wire[wSize];
+		size = bSize;
 		
 		//Initializing the board
 		for(int i = 0; i < bSize; i++)
@@ -499,6 +501,12 @@ public class RouterModel extends AbstractModel
 	 */
 	public void Solve()
 	{
+		findPaths();
+		for(int i = 0; i < wArr[0].getPaths().size(); i++)
+		{
+			System.out.println(wArr[0].getPaths().get(i));
+		}
+		/*
 		//Start with a fresh board
 		clear();
 		int numDone = 0;
@@ -541,6 +549,7 @@ public class RouterModel extends AbstractModel
 			addTo(t2Col,t2Row);
 		}
 		fireTableStructureChanged();
+		*/
 	}
 	
 	/**
@@ -630,94 +639,110 @@ public class RouterModel extends AbstractModel
 	{
 		for(int i = 0; i < wArr.length; i++)
 		{
-			wArr[i].setPaths(potentialPaths(wArr[i].getFirst().getCoords(), wArr[i].getT2().getCoords()));
+			System.out.println("On the " + i + "th wire");
+			ArrayList<Coordinate> visits = new ArrayList<Coordinate>();
+			ArrayList<path> vals = potentialPaths(wArr[i].getFirst().getCoords(), wArr[i].getT2().getCoords(), visits);
+			wArr[i].setPaths(vals);
 		}
+		System.out.println("done finding paths");
 	}
 	
-	private ArrayList<path> potentialPaths(int[] coords, int[] end)
+	private ArrayList<path> potentialPaths(Coordinate coords, Coordinate end, ArrayList<Coordinate> visited)
 	{
+		visited.add(coords);
 		path p = new path(coords);
 		ArrayList<path> result = new ArrayList<path>();
 		result.add(p);
 		
-		if(!coords.equals(end))
+		if(!(coords.equals(end)))
 		{
 			//All paths after moving left, if left is a valid direction
-			int[] leftMove = new int[2];
-			leftMove[0] = coords[0] - 1;
-			leftMove[1] = coords[1];
-			//If the tile to the left is not off the board, empty, and non terminal...
-			if(leftMove[0] >= 0 && board[leftMove[0]][leftMove[1]].getIsEmpty() && !board[leftMove[0]][leftMove[1]].getIsTerminal())
+			Coordinate leftMove = new Coordinate(coords.getColumn() - 1, coords.getRow());	
+			ArrayList<path> leftMoves = possibleMoves(leftMove, end, visited, coords);
+			for (int i = 0; i < leftMoves.size(); i++)
 			{
-				ArrayList<path> temp = potentialPaths(leftMove,end);
-				for (int i = 0; i < temp.size(); i++)
-				{
-					//Only worry about paths that end where I need them to
-					if(temp.get(i).getPath().getLast().equals(end))
-					{
-						path tempP = p;
-						result.add(tempP.combine(temp.get(i)));
-					}
-				}
+				path tempP = p.combine(leftMoves.get(i));
+				//System.out.println(tempP);
+				result.add(tempP);
 			}
 			
-			//All paths after moving right if right is a valid direction
-			int[] rightMove = new int[2];
-			rightMove[0] = coords[0] + 1;
-			rightMove[1] = coords[1];
-			//If the tile to the left is not off the board, empty, and non terminal...
-			if(rightMove[0] <= board[0].length && board[rightMove[0]][rightMove[1]].getIsEmpty() && !board[rightMove[0]][rightMove[1]].getIsTerminal())
+			Coordinate rightMove = new Coordinate(coords.getColumn() + 1, coords.getRow());
+			ArrayList<path> rightMoves = possibleMoves(rightMove, end, visited, coords);
+			for (int i = 0; i < rightMoves.size(); i++)
 			{
-				ArrayList<path> temp = potentialPaths(rightMove,end);
-				for (int i = 0; i < temp.size(); i++)
-				{
-					//Only worry about paths that end where I need them to
-					if(temp.get(i).getPath().getLast().equals(end))
-					{
-						path tempP = p;
-						result.add(tempP.combine(temp.get(i)));
-					}
-				}
+				path tempP = p.combine(rightMoves.get(i));
+				//System.out.println(tempP);
+				result.add(tempP);
 			}
 			
-			//All paths to the end after moving up if up is a valid move
-			int[] upMove = new int[2];
-			upMove[0] = coords[0];
-			upMove[1] = coords[1] + 1;
-			//If the tile to the left is not off the board, empty, and non terminal...
-			if(upMove[1] <= board[0].length && board[upMove[0]][upMove[1]].getIsEmpty() && !board[upMove[0]][upMove[1]].getIsTerminal())
+			Coordinate upMove = new Coordinate(coords.getColumn(), coords.getRow() - 1);
+			ArrayList<path> upMoves = possibleMoves(upMove, end, visited, coords);
+			for (int i = 0; i < upMoves.size(); i++)
 			{
-				ArrayList<path> temp = potentialPaths(upMove,end);
-				for (int i = 0; i < temp.size(); i++)
-				{
-					//Only worry about paths that end where I need them to
-					if(temp.get(i).getPath().getLast().equals(end))
-					{
-						path tempP = p;
-						result.add(tempP.combine(temp.get(i)));
-					}
-				}
+				path tempP = p.combine(upMoves.get(i));
+				//System.out.println(tempP);
+				result.add(tempP);
 			}
 			
-			int[] downMove = new int[2];
-			downMove[0] = coords[0];
-			downMove[1] = coords[1] - 1;
-			//If the tile to the left is not off the board, empty, and non terminal...
-			if(downMove[1] >= 0 && board[downMove[0]][downMove[1]].getIsEmpty() && !board[downMove[0]][downMove[1]].getIsTerminal())
+			Coordinate downMove = new Coordinate(coords.getColumn(), coords.getRow() + 1);
+			ArrayList<path> downMoves = possibleMoves(downMove, end, visited, coords);
+			for (int i = 0; i < downMoves.size(); i++)
 			{
-				ArrayList<path> temp = potentialPaths(downMove,end);
-				for (int i = 0; i < temp.size(); i++)
+				path tempP = p.combine(downMoves.get(i));
+				//System.out.println(tempP);
+				result.add(tempP);
+			}
+		}
+		visited.remove(visited.indexOf(coords));
+		
+		return result;
+	}
+	
+	private boolean alreadyVisited(ArrayList<Coordinate> points, Coordinate coords)
+	{
+		for(int i = 0; i < points.size(); i++)
+		{
+			if(points.get(i).equals(coords))
+				return true;
+		}
+		
+		return false;
+	}
+	
+	private boolean isInvalidTerminal(Coordinate coords, Coordinate end)
+	{
+		return board[coords.getColumn()][coords.getRow()].getIsTerminal() && !(coords.equals(end));
+	}
+	
+	private ArrayList<path> possibleMoves(Coordinate coords, Coordinate end, ArrayList<Coordinate> visited, Coordinate from)
+	{
+		ArrayList<path> results = new ArrayList<path>();
+		if(isValidMove(coords, visited, end))
+		{
+			System.out.println("Moving from [" + from.getColumn() + ", " + from.getRow() + "] to [" + coords.getColumn() + ", " + coords.getRow() + "].");
+			ArrayList<path> temp = potentialPaths(coords,end,visited);
+			for (int i = 0; i < temp.size(); i++)
+			{
+				path pTemp = (path)temp.get(i);
+				//System.out.println(pTemp);
+				//Only worry about paths that end where I need them to
+				if(pTemp.getPath().getLast().equals(end))
 				{
-					//Only worry about paths that end where I need them to
-					if(temp.get(i).getPath().getLast().equals(end))
-					{
-						path tempP = p;
-						result.add(tempP.combine(temp.get(i)));
-					}
+					results.add(pTemp);
 				}
 			}
 		}
-		
+		return results;
+	}
+	
+	private boolean isValidMove(Coordinate coords, ArrayList<Coordinate> visited, Coordinate end)
+	{
+		boolean result = true;
+		int column = coords.getColumn();
+		int row = coords.getRow(); 
+		result = (row >= 0 && row < size) && (column >= 0 && column < size);
+		result = result && !alreadyVisited(visited, coords);
+		result = result && !isInvalidTerminal(coords, end);
 		return result;
 	}
 }

@@ -83,12 +83,9 @@ public class Tile
 		return column;
 	}
 	
-	public int[] getCoords()
+	public Coordinate getCoords()
 	{
-		int[] temp = new int[2];
-		temp[0] = getRow();
-		temp[1] = getColumn();
-		return temp;
+		return new Coordinate(column, row);
 	}
 
 	/**
