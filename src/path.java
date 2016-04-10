@@ -9,6 +9,11 @@ public class path
 		pathway.add(svalue);
 	}
 	
+	public path(LinkedList<Coordinate> p)
+	{
+		pathway = p;
+	}
+	
 	public Coordinate getStart()
 	{
 		return pathway.get(0);
@@ -47,16 +52,11 @@ public class path
 		return false;
 	}
 	
-	public path combine(path other)
+	public path addToStart(Coordinate val)
 	{
-		path temp = new path(getStart());
-		temp.setPath(pathway);
-		LinkedList<Coordinate> otherP = other.getPath();
-		for(int i = 0; i < other.getPath().size(); i++)
-		{
-			updatePath(otherP.get(i));
-		}
-		return temp;
+		LinkedList<Coordinate> tempList = getPath();
+		tempList.addFirst(val);
+		return new path(tempList);
 	}
 
 	@Override

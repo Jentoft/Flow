@@ -170,7 +170,6 @@ public class VC implements ActionListener, ListSelectionListener
             {
                 starters[i] = in.nextInt();
             }
-            System.out.println("]");
             //Calls my model constructor for a Router model since solitaire doesn't need to import a board
             model = new RouterModel(size, starters.length/4, starters);
             

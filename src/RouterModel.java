@@ -502,9 +502,13 @@ public class RouterModel extends AbstractModel
 	public void Solve()
 	{
 		findPaths();
-		for(int i = 0; i < wArr[0].getPaths().size(); i++)
+		for(int j = 0; j < wArr.length; j++)
 		{
-			System.out.println(wArr[0].getPaths().get(i));
+			System.out.println(j + "th wire: ");
+			for(int i = 0; i < wArr[j].getPaths().size(); i++)
+			{
+				System.out.println(wArr[j].getPaths().get(i));
+			}
 		}
 		/*
 		//Start with a fresh board
@@ -644,7 +648,6 @@ public class RouterModel extends AbstractModel
 			ArrayList<path> vals = potentialPaths(wArr[i].getFirst().getCoords(), wArr[i].getT2().getCoords(), visits);
 			wArr[i].setPaths(vals);
 		}
-		System.out.println("done finding paths");
 	}
 	
 	private ArrayList<path> potentialPaths(Coordinate coords, Coordinate end, ArrayList<Coordinate> visited)
@@ -661,7 +664,7 @@ public class RouterModel extends AbstractModel
 			ArrayList<path> leftMoves = possibleMoves(leftMove, end, visited, coords);
 			for (int i = 0; i < leftMoves.size(); i++)
 			{
-				path tempP = p.combine(leftMoves.get(i));
+				path tempP = leftMoves.get(i).addToStart(leftMove);
 				//System.out.println(tempP);
 				result.add(tempP);
 			}
@@ -670,7 +673,7 @@ public class RouterModel extends AbstractModel
 			ArrayList<path> rightMoves = possibleMoves(rightMove, end, visited, coords);
 			for (int i = 0; i < rightMoves.size(); i++)
 			{
-				path tempP = p.combine(rightMoves.get(i));
+				path tempP = rightMoves.get(i).addToStart(rightMove);
 				//System.out.println(tempP);
 				result.add(tempP);
 			}
@@ -679,7 +682,7 @@ public class RouterModel extends AbstractModel
 			ArrayList<path> upMoves = possibleMoves(upMove, end, visited, coords);
 			for (int i = 0; i < upMoves.size(); i++)
 			{
-				path tempP = p.combine(upMoves.get(i));
+				path tempP = upMoves.get(i).addToStart(upMove);
 				//System.out.println(tempP);
 				result.add(tempP);
 			}
@@ -688,7 +691,7 @@ public class RouterModel extends AbstractModel
 			ArrayList<path> downMoves = possibleMoves(downMove, end, visited, coords);
 			for (int i = 0; i < downMoves.size(); i++)
 			{
-				path tempP = p.combine(downMoves.get(i));
+				path tempP = downMoves.get(i).addToStart(downMove);
 				//System.out.println(tempP);
 				result.add(tempP);
 			}
@@ -719,7 +722,7 @@ public class RouterModel extends AbstractModel
 		ArrayList<path> results = new ArrayList<path>();
 		if(isValidMove(coords, visited, end))
 		{
-			System.out.println("Moving from [" + from.getColumn() + ", " + from.getRow() + "] to [" + coords.getColumn() + ", " + coords.getRow() + "].");
+//			System.out.println("Moving from [" + from.getColumn() + ", " + from.getRow() + "] to [" + coords.getColumn() + ", " + coords.getRow() + "].");
 			ArrayList<path> temp = potentialPaths(coords,end,visited);
 			for (int i = 0; i < temp.size(); i++)
 			{
