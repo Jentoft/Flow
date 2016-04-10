@@ -501,6 +501,7 @@ public class RouterModel extends AbstractModel
 	 */
 	public void Solve()
 	{
+		final long startTime = System.currentTimeMillis();
 		findPaths();
 		for(int j = 0; j < wArr.length; j++)
 		{
@@ -510,6 +511,12 @@ public class RouterModel extends AbstractModel
 				System.out.println(wArr[j].getPaths().get(i));
 			}
 		}
+		final long timeDifference = System.currentTimeMillis() - startTime;
+		long second = (timeDifference / 1000) % 60;
+		long minute = (timeDifference / 60000) % 60;
+		long hour = (timeDifference / (1000 * 60 * 60)) % 24;
+		String time = String.format("%02d:%02d:%02d:%d", hour, minute, second, timeDifference);
+		System.out.println("Solve time: " + time);
 		/*
 		//Start with a fresh board
 		clear();
@@ -664,7 +671,7 @@ public class RouterModel extends AbstractModel
 			ArrayList<path> leftMoves = possibleMoves(leftMove, end, visited, coords);
 			for (int i = 0; i < leftMoves.size(); i++)
 			{
-				path tempP = leftMoves.get(i).addToStart(leftMove);
+				path tempP = leftMoves.get(i).addToStart(coords);
 				//System.out.println(tempP);
 				result.add(tempP);
 			}
@@ -673,7 +680,7 @@ public class RouterModel extends AbstractModel
 			ArrayList<path> rightMoves = possibleMoves(rightMove, end, visited, coords);
 			for (int i = 0; i < rightMoves.size(); i++)
 			{
-				path tempP = rightMoves.get(i).addToStart(rightMove);
+				path tempP = rightMoves.get(i).addToStart(coords);
 				//System.out.println(tempP);
 				result.add(tempP);
 			}
@@ -682,7 +689,7 @@ public class RouterModel extends AbstractModel
 			ArrayList<path> upMoves = possibleMoves(upMove, end, visited, coords);
 			for (int i = 0; i < upMoves.size(); i++)
 			{
-				path tempP = upMoves.get(i).addToStart(upMove);
+				path tempP = upMoves.get(i).addToStart(coords);
 				//System.out.println(tempP);
 				result.add(tempP);
 			}
@@ -691,7 +698,7 @@ public class RouterModel extends AbstractModel
 			ArrayList<path> downMoves = possibleMoves(downMove, end, visited, coords);
 			for (int i = 0; i < downMoves.size(); i++)
 			{
-				path tempP = downMoves.get(i).addToStart(downMove);
+				path tempP = downMoves.get(i).addToStart(coords);
 				//System.out.println(tempP);
 				result.add(tempP);
 			}
