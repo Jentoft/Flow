@@ -506,10 +506,12 @@ public class RouterModel extends AbstractModel
 		for(int j = 0; j < wArr.length; j++)
 		{
 			System.out.println(j + "th wire: ");
+			/**
 			for(int i = 0; i < wArr[j].getPaths().size(); i++)
 			{
 				System.out.println(wArr[j].getPaths().get(i));
 			}
+			**/
 		}
 		final long timeDifference = System.currentTimeMillis() - startTime;
 		long second = (timeDifference / 1000) % 60;
@@ -651,14 +653,16 @@ public class RouterModel extends AbstractModel
 		for(int i = 0; i < wArr.length; i++)
 		{
 			System.out.println("On the " + i + "th wire");
+			Node<Coordinate> paths = new Node<Coordinate>(wArr[i].getFirst().getCoords());
 			ArrayList<Coordinate> visits = new ArrayList<Coordinate>();
-			ArrayList<path> vals = potentialPaths(wArr[i].getFirst().getCoords(), wArr[i].getT2().getCoords(), visits);
-			wArr[i].setPaths(vals);
+			paths = potentialPaths(wArr[i].getT2().getCoords(), visits, paths);
+			wArr[i].setPaths(paths);
 		}
 	}
 	
-	private ArrayList<path> potentialPaths(Coordinate coords, Coordinate end, ArrayList<Coordinate> visited)
+	private Node<Coordinate> potentialPaths(Coordinate end, ArrayList<Coordinate> visited, Node<Coordinate> parent)
 	{
+		Coordinate coords = parent.getData();
 		visited.add(coords);
 		path p = new path(coords);
 		ArrayList<path> result = new ArrayList<path>();
@@ -667,45 +671,41 @@ public class RouterModel extends AbstractModel
 		if(!(coords.equals(end)))
 		{
 			//All paths after moving left, if left is a valid direction
-			Coordinate leftMove = new Coordinate(coords.getColumn() - 1, coords.getRow());	
-			ArrayList<path> leftMoves = possibleMoves(leftMove, end, visited, coords);
-			for (int i = 0; i < leftMoves.size(); i++)
+			Coordinate leftMove = new Coordinate(coords.getColumn() - 1, coords.getRow());
+			if(isValidMove(leftMove, visited, end))
 			{
-				path tempP = leftMoves.get(i).addToStart(coords);
-				//System.out.println(tempP);
-				result.add(tempP);
+				Node<Coordinate> lMove = new Node<Coordinate>(leftMove);
+				lMove = potentialPaths(end,visited,lMove);
+				parent.addChild(lMove);
 			}
 			
 			Coordinate rightMove = new Coordinate(coords.getColumn() + 1, coords.getRow());
-			ArrayList<path> rightMoves = possibleMoves(rightMove, end, visited, coords);
-			for (int i = 0; i < rightMoves.size(); i++)
+			if(isValidMove(rightMove, visited, end))
 			{
-				path tempP = rightMoves.get(i).addToStart(coords);
-				//System.out.println(tempP);
-				result.add(tempP);
+				Node<Coordinate> rMove = new Node<Coordinate>(rightMove);
+				rMove = potentialPaths(end, visited, rMove);
+				parent.addChild(rMove);
 			}
 			
 			Coordinate upMove = new Coordinate(coords.getColumn(), coords.getRow() - 1);
-			ArrayList<path> upMoves = possibleMoves(upMove, end, visited, coords);
-			for (int i = 0; i < upMoves.size(); i++)
+			if(isValidMove(upMove, visited, end))
 			{
-				path tempP = upMoves.get(i).addToStart(coords);
-				//System.out.println(tempP);
-				result.add(tempP);
+				Node<Coordinate> uMove = new Node<Coordinate>(upMove);
+				uMove = potentialPaths(end, visited, uMove);
+				parent.addChild(uMove);
 			}
 			
 			Coordinate downMove = new Coordinate(coords.getColumn(), coords.getRow() + 1);
-			ArrayList<path> downMoves = possibleMoves(downMove, end, visited, coords);
-			for (int i = 0; i < downMoves.size(); i++)
+			if(isValidMove(downMove, visited, end))
 			{
-				path tempP = downMoves.get(i).addToStart(coords);
-				//System.out.println(tempP);
-				result.add(tempP);
+				Node<Coordinate> dMove = new Node<Coordinate>(downMove);
+				dMove = potentialPaths(end, visited, dMove);
+				parent.addChild(dMove);
 			}
 		}
 		visited.remove(visited.indexOf(coords));
 		
-		return result;
+		return parent;
 	}
 	
 	private boolean alreadyVisited(ArrayList<Coordinate> points, Coordinate coords)
@@ -723,28 +723,7 @@ public class RouterModel extends AbstractModel
 	{
 		return board[coords.getColumn()][coords.getRow()].getIsTerminal() && !(coords.equals(end));
 	}
-	
-	private ArrayList<path> possibleMoves(Coordinate coords, Coordinate end, ArrayList<Coordinate> visited, Coordinate from)
-	{
-		ArrayList<path> results = new ArrayList<path>();
-		if(isValidMove(coords, visited, end))
-		{
-//			System.out.println("Moving from [" + from.getColumn() + ", " + from.getRow() + "] to [" + coords.getColumn() + ", " + coords.getRow() + "].");
-			ArrayList<path> temp = potentialPaths(coords,end,visited);
-			for (int i = 0; i < temp.size(); i++)
-			{
-				path pTemp = (path)temp.get(i);
-				//System.out.println(pTemp);
-				//Only worry about paths that end where I need them to
-				if(pTemp.getPath().getLast().equals(end))
-				{
-					results.add(pTemp);
-				}
-			}
-		}
-		return results;
-	}
-	
+		
 	private boolean isValidMove(Coordinate coords, ArrayList<Coordinate> visited, Coordinate end)
 	{
 		boolean result = true;
